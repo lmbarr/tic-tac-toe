@@ -11,6 +11,7 @@ from .forms import InvitationForm
 def home(request):
     my_games = Game.objects.games_for_user(request.user)
     active_games = my_games.active()
+    finished_games = my_games.difference(active_games)
     invitations = request.user.invitations_received.all()
     return render(request, "player/home.html", {"games": active_games, "invitations": invitations})
 
@@ -32,8 +33,6 @@ def new_invitation(request):
 @login_required
 def accept_invitation(request, id):
     invitation = get_object_or_404(Invitation, pk=id)
-    print(id)
-    print(request.method)
 
     if not request.user == invitation.to_user:
         raise PermissionDenied
@@ -42,7 +41,7 @@ def accept_invitation(request, id):
             game = Game.objects.create(first_player=invitation.to_user,
                                        second_player=invitation.from_user)
             invitation.delete()
-            return redirect('player_home')
+            return redirect(game) # call to the method get_absolute_url automatically
     else:
         return render(request,
                       'player/accept_invitation_form.html',
