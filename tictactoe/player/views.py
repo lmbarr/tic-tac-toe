@@ -13,7 +13,10 @@ def home(request):
     active_games = my_games.active()
     finished_games = my_games.difference(active_games)
     invitations = request.user.invitations_received.all()
-    return render(request, "player/home.html", {"games": active_games, "invitations": invitations})
+    print(active_games)
+    print(finished_games)
+    return render(request, "player/home.html", {"active_games": list(active_games), "finished_games": list(finished_games),
+                                                "invitations": invitations})
 
 
 @login_required
